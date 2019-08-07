@@ -21,11 +21,8 @@ class App extends Component {
         'content-type': 'application/json'
       }
     }).then(res => {
-      fetch('http://localhost:9090/notes')
-      .then(res => res.json())
-      .then(res => {
-        this.setState({notes:res});
-      });
+      let temp = this.state.notes.filter(note => note.id !== noteId)
+      this.setState({notes:temp});
     });
   }
 

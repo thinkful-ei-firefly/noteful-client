@@ -5,7 +5,6 @@ import NoteListNav from '../NoteListNav/NoteListNav';
 import NotePageNav from '../NotePageNav/NotePageNav';
 import NoteListMain from '../NoteListMain/NoteListMain';
 import NotePageMain from '../NotePageMain/NotePageMain';
-import dummyStore from '../dummy-store';
 import Context from '../Context';
 import './App.css';
 
@@ -15,9 +14,38 @@ class App extends Component {
     folders: []
   };
 
+  delButton = noteId =>{
+    fetch(`http://localhost:9090/notes/${noteId}`, {
+      method: 'DELETE',
+      headers: {
+        'content-type': 'application/json'
+      }
+    }).then(res => {
+      fetch('http://localhost:9090/notes')
+      .then(res => res.json())
+      .then(res => {
+        this.setState({notes:res});
+      });
+    });
+  }
+
+  updateState = input => {
+    this.setState({notes: input});
+  }
+
   componentDidMount() {
     // fake date loading from API call
-    setTimeout(() => this.setState(dummyStore), 600);
+
+    fetch('http://localhost:9090/folders')
+    .then(res => res.json())
+    .then(res => {
+      this.setState({folders:res});
+    });
+    fetch('http://localhost:9090/notes')
+    .then(res => res.json())
+    .then(res => {
+      this.setState({notes:res});
+    });
   }
 
   renderNavRoutes() {
@@ -67,9 +95,11 @@ class App extends Component {
   }
 
   render() {
+
+
     return (
       <Context.Provider
-        value={{ notes: this.state.notes, folders: this.state.folders }}
+        value={{ notes: this.state.notes, folders: this.state.folders, delButton: this.delButton, updateState: this.updateState }}
       >
         <div className="App">
           <nav className="App__nav">{this.renderNavRoutes()}</nav>
